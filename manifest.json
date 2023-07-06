@@ -1,6 +1,6 @@
 {
-    "name": "xdi_builder_2",
-    "short_name": "xdi_builder_2",
+    "name": "taglist_converter",
+    "short_name": "taglist_converter",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
