@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir -p /tmp/backup_extract)",
+      "Bash(tar -xf \"ID 1 DG 1.backup\" -C /tmp/backup_extract)",
+      "Read(//tmp/**)",
+      "Bash(tar -tf /tmp/backup_extract/xmlfiles.tar)",
+      "Bash(mkdir -p /tmp/backup_xml)",
+      "Bash(tar -xf /tmp/backup_extract/xmlfiles.tar -C /tmp/backup_xml)",
+      "Bash(head -80 \"/tmp/backup_xml/ModbusMap&protocol_id=1&function_code=3&address=0&quantity=65535.xml\")",
+      "Bash(python3 -c \":*)",
+      "Bash(python3 -c \"import os; print\\(os.path.exists\\(''C:/Users/anton/AppData/Local/Temp/backup_xml/ModbusGroups.xml''\\)\\); import tempfile; print\\(tempfile.gettempdir\\(\\)\\)\")",
+      "Bash(flutter pub:*)"
+    ]
+  }
+}
