@@ -15,7 +15,7 @@ function buildAuthUrl() {
     response_type: 'token',
     name: 'Trellegant',
     key,
-    return_url: window.location.origin,
+    return_url: 'https://athorsnes.github.io/trellegant/authorize-callback.html',
   });
   return `https://trello.com/1/authorize?${params}`;
 }
