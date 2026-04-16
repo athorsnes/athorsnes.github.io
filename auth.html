@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Authorize Trellegant</title>
+  <link rel="stylesheet" href="./css/styles.css">
+  <script src="https://p.trellocdn.com/power-up.min.js"></script>
+  <script src="./js/config.js"></script>
+</head>
+<body class="popup-body">
+  <div class="auth-container">
+    <p class="auth-description">
+      Trellegant needs permission to create and update cards on your behalf
+      (adding tasks from the Gantt chart and syncing dates).
+    </p>
+    <button id="btn-authorize" class="btn btn-primary btn-full">
+      Authorize Trellegant
+    </button>
+    <button id="btn-deauthorize" class="btn btn-ghost btn-full" style="display:none;">
+      Remove Authorization
+    </button>
+    <p id="auth-status" class="auth-status"></p>
+  </div>
+
+  <script src="./js/auth.js"></script>
+</body>
+</html>

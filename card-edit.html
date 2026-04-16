@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gantt Details</title>
+  <link rel="stylesheet" href="./css/styles.css">
+  <script src="https://p.trellocdn.com/power-up.min.js"></script>
+  <script src="./js/config.js"></script>
+</head>
+<body class="popup-body">
+  <form id="card-edit-form" class="card-edit-form">
+
+    <div class="form-row">
+      <label for="start-date">Start Date</label>
+      <input type="date" id="start-date" name="startDate">
+    </div>
+
+    <div class="form-row">
+      <label for="due-date">Due Date</label>
+      <input type="date" id="due-date" name="dueDate">
+    </div>
+
+    <div class="form-row">
+      <label for="pct-complete">
+        Progress
+        <span id="pct-display" class="pct-display">0%</span>
+      </label>
+      <input type="range" id="pct-complete" name="percentComplete"
+             min="0" max="100" step="5" value="0">
+    </div>
+
+    <div class="form-row form-row-check">
+      <label class="checkbox-label">
+        <input type="checkbox" id="is-milestone" name="isMilestone">
+        <span>Mark as Milestone</span>
+      </label>
+    </div>
+
+    <div class="form-row">
+      <label>Dependencies</label>
+      <div id="dep-list" class="dep-list">
+        <p class="dep-loading">Loading cards…</p>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" id="btn-cancel" class="btn btn-ghost">Cancel</button>
+      <button type="submit" id="btn-save" class="btn btn-primary">Save</button>
+    </div>
+
+  </form>
+
+  <script src="./js/card-edit.js"></script>
+</body>
+</html>

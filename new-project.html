@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create New Project</title>
+  <link rel="stylesheet" href="./css/styles.css">
+  <script src="https://p.trellocdn.com/power-up.min.js"></script>
+  <script src="./js/config.js"></script>
+  <script src="./js/template.js"></script>
+</head>
+<body class="popup-body">
+
+  <!-- ── Create form ───────────────────────────────────────────────────── -->
+  <div id="view-form">
+    <form id="new-project-form" class="new-project-form">
+
+      <div class="form-row">
+        <label for="project-name">Project Name <span class="required">*</span></label>
+        <input type="text" id="project-name" name="name"
+               placeholder="e.g. Website Redesign" maxlength="200" required>
+      </div>
+
+      <div class="form-row">
+        <label for="project-desc">Description</label>
+        <textarea id="project-desc" name="desc" rows="2"
+                  placeholder="What is this project about?"></textarea>
+      </div>
+
+      <div class="form-row-2col">
+        <div class="form-row">
+          <label for="project-start">Start Date <span class="required">*</span></label>
+          <input type="date" id="project-start" name="startDate" required>
+        </div>
+        <div class="form-row">
+          <label for="project-end">End Date <span class="required">*</span></label>
+          <input type="date" id="project-end" name="endDate" required>
+        </div>
+      </div>
+
+      <div class="template-preview">
+        <p class="template-label">Template includes:</p>
+        <ul class="template-items" id="template-items"></ul>
+      </div>
+
+      <p id="form-error" class="form-error" style="display:none;"></p>
+
+      <div class="form-actions">
+        <button type="button" id="btn-cancel" class="btn btn-ghost">Cancel</button>
+        <button type="submit" id="btn-create" class="btn btn-primary">Create Project</button>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- ── Progress view ─────────────────────────────────────────────────── -->
+  <div id="view-progress" style="display:none;" class="progress-view">
+    <div class="progress-spinner"></div>
+    <p id="progress-text">Creating board…</p>
+  </div>
+
+  <!-- ── Success view ──────────────────────────────────────────────────── -->
+  <div id="view-success" style="display:none;" class="success-view">
+    <div class="success-icon">✓</div>
+    <h2 id="success-title">Project created!</h2>
+    <p id="success-desc"></p>
+    <div class="form-actions">
+      <button id="btn-open-board" class="btn btn-primary">Open Board</button>
+      <button id="btn-close-modal" class="btn btn-ghost">Close</button>
+    </div>
+  </div>
+
+  <script src="./js/new-project.js"></script>
+</body>
+</html>
