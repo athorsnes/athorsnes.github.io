@@ -22,13 +22,19 @@
   <script>
     // Trello redirects here with the token in the URL fragment:
     // https://athorsnes.github.io/authorize-callback.html#token=xxxx
-    const hash   = window.location.hash.slice(1);
-    const params = new URLSearchParams(hash);
-    const token  = params.get('token');
+    var hash   = window.location.hash.slice(1);
+    var params = new URLSearchParams(hash);
+    var token  = params.get('token');
 
     if (token) {
-      // Store in localStorage — auth.js polls for this key
-      localStorage.setItem('trellegant_auth_token', token);
+      // Primary: call window.opener.authorize if available
+      // (this is what t.authorize() sets up on the parent window)
+      if (window.opener && typeof window.opener.authorize === 'function') {
+        window.opener.authorize(token);
+      } else {
+        // Fallback: t.authorize() also polls localStorage for the key 'token'
+        localStorage.setItem('token', token);
+      }
       window.close();
     } else {
       document.querySelector('p').textContent =
