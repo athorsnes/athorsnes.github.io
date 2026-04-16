@@ -21,22 +21,18 @@
   <p>Authorizing… this window will close automatically.</p>
   <script>
     // Trello redirects here with the token in the URL fragment:
-    // https://athorsnes.github.io/trellegant/authorize-callback.html#token=xxxx
-    const hash   = window.location.hash.slice(1); // strip leading #
+    // https://athorsnes.github.io/authorize-callback.html#token=xxxx
+    const hash   = window.location.hash.slice(1);
     const params = new URLSearchParams(hash);
     const token  = params.get('token');
 
-    if (token && window.opener && typeof window.opener.authorize === 'function') {
-      // Hand the token back to the Power-Up client library
-      window.opener.authorize(token);
-      window.close();
-    } else if (token) {
-      // Fallback: store in localStorage — t.authorize() polls for this too
-      localStorage.setItem('trello_token', token);
+    if (token) {
+      // Store in localStorage — auth.js polls for this key
+      localStorage.setItem('trellegant_auth_token', token);
       window.close();
     } else {
       document.querySelector('p').textContent =
-        'Authorization failed — no token received. You can close this window.';
+        'Authorization failed — no token found. You can close this window.';
     }
   </script>
 </body>
