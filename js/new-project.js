@@ -1,7 +1,10 @@
 /* global TrelloPowerUp, TRELLEGANT_CONFIG, PROJECT_TEMPLATE */
 'use strict';
 
-const t = TrelloPowerUp.iframe({ targetOrigin: '*' });
+const t = TrelloPowerUp.iframe({
+  appKey:  TRELLEGANT_CONFIG.API_KEY,
+  appName: 'Trellegant',
+});
 
 // ── DOM refs ──────────────────────────────────────────────────────────────────
 
@@ -71,7 +74,7 @@ function addDays(dateStr, n) {
 }
 
 async function apiCall(path, method = 'GET', body = null) {
-  const token = await t.get('member', 'private', 'token');
+  const token = await t.getRestApi().getToken();
   const key   = TRELLEGANT_CONFIG.API_KEY;
   const params = new URLSearchParams({ key, token });
   const url   = `https://api.trello.com/1${path}?${params}`;
@@ -182,8 +185,8 @@ form.addEventListener('submit', async (e) => {
   if (new Date(endDate) < new Date(startDate)) return showError('End date must be after start date.');
 
   // Check auth
-  const token = await t.get('member', 'private', 'token');
-  if (!token) {
+  const isAuthorized = await t.getRestApi().isAuthorized();
+  if (!isAuthorized) {
     return showError('You need to authorize Trellegant first. Go to Power-Up Settings → Authorize Trellegant.');
   }
 

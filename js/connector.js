@@ -116,9 +116,9 @@ TrelloPowerUp.initialize({
 
   // ── Authorization ──────────────────────────────────────────────────────────
 
-  'authorization-status': async (t) => {
-    const token = await t.get('member', 'private', 'token');
-    return { authorized: !!token };
+  'authorization-status': (t) => {
+    return t.getRestApi().isAuthorized()
+      .then((isAuthorized) => ({ authorized: isAuthorized }));
   },
 
   'show-authorization': (t) => {

@@ -12,7 +12,10 @@ const ROW_HEIGHT = 38; // must match CSS .gantt .bar-row height
 
 // ── State ─────────────────────────────────────────────────────────────────────
 
-const t = TrelloPowerUp.iframe({ targetOrigin: '*' });
+const t = TrelloPowerUp.iframe({
+  appKey:  TRELLEGANT_CONFIG.API_KEY,
+  appName: 'Trellegant',
+});
 let ganttInstance = null;
 let boardData     = { lists: [], cards: [] };
 let colorMap      = {};       // listId → color
@@ -59,14 +62,12 @@ function today() {
 }
 
 async function apiCall(path, method = 'GET', body = null) {
-  const token = await t.get('member', 'private', 'token');
+  const token = await t.getRestApi().getToken();
   const key   = TRELLEGANT_CONFIG.API_KEY;
   const url   = `https://api.trello.com/1${path}`;
   const params = new URLSearchParams({ key, token });
   const opts  = { method, headers: { 'Content-Type': 'application/json' } };
-  if (body) {
-    opts.body = JSON.stringify({ ...body, key, token });
-  }
+  if (body) opts.body = JSON.stringify(body);
   const res = await fetch(`${url}?${params}`, opts);
   if (!res.ok) throw new Error(`API ${method} ${path} → ${res.status}`);
   return res.json();
@@ -82,7 +83,7 @@ function getPluginData(card, pluginId) {
 
 async function loadBoardData() {
   const ctx     = t.getContext();
-  const token   = await t.get('member', 'private', 'token');
+  const token   = await t.getRestApi().getToken();
   const key     = TRELLEGANT_CONFIG.API_KEY;
   const boardId = ctx.board;
   const pluginId = ctx.plugin;
@@ -90,7 +91,7 @@ async function loadBoardData() {
   const [listsRes, cardsRes, boardRes] = await Promise.all([
     fetch(`https://api.trello.com/1/boards/${boardId}/lists?filter=open&key=${key}&token=${token}`),
     fetch(`https://api.trello.com/1/boards/${boardId}/cards?filter=open&pluginData=true&members=true&key=${key}&token=${token}`),
-    fetch(`https://api.trello.com/1/boards/${boardId}?key=${key}&token=${token}`),
+    fetch(`https://api.trello.com/1/boards/${boardId}?fields=name&key=${key}&token=${token}`),
   ]);
 
   if (!listsRes.ok || !cardsRes.ok || !boardRes.ok) {

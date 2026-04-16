@@ -1,7 +1,10 @@
 /* global TrelloPowerUp, TRELLEGANT_CONFIG */
 'use strict';
 
-const t = TrelloPowerUp.iframe();
+const t = TrelloPowerUp.iframe({
+  appKey:  TRELLEGANT_CONFIG.API_KEY,
+  appName: 'Trellegant',
+});
 
 const form        = document.getElementById('card-edit-form');
 const startInput  = document.getElementById('start-date');
@@ -25,9 +28,10 @@ function toISOString(dateValue) {
 }
 
 async function apiCall(path, method = 'GET', body = null) {
-  const token = await t.get('member', 'private', 'token');
+  const token = await t.getRestApi().getToken();
   const key   = TRELLEGANT_CONFIG.API_KEY;
-  const url   = `https://api.trello.com/1${path}?key=${key}&token=${token}`;
+  const params = new URLSearchParams({ key, token });
+  const url   = `https://api.trello.com/1${path}?${params}`;
   const opts  = { method, headers: { 'Content-Type': 'application/json' } };
   if (body) opts.body = JSON.stringify(body);
   const res = await fetch(url, opts);
@@ -71,7 +75,7 @@ async function loadCard() {
 async function loadDependencies(boardId, currentCardId, selectedIds) {
   depList.innerHTML = '';
   try {
-    const token = await t.get('member', 'private', 'token');
+    const token = await t.getRestApi().getToken();
     const key   = TRELLEGANT_CONFIG.API_KEY;
     const res   = await fetch(
       `https://api.trello.com/1/boards/${boardId}/cards?filter=open&key=${key}&token=${token}`
