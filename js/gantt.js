@@ -24,7 +24,6 @@ let addTaskListId = null;     // which list the add-task input targets
 // ── DOM refs ──────────────────────────────────────────────────────────────────
 
 const boardTitle     = document.getElementById('board-title');
-const leftBody       = document.getElementById('gantt-left-body');
 const ganttRight     = document.getElementById('gantt-right');
 const statusBar      = document.getElementById('status-bar');
 const statusText     = document.getElementById('status-text');
@@ -168,75 +167,6 @@ function buildGanttTasks(lists, cards, pluginId) {
   return tasks;
 }
 
-// ── Left panel rendering ──────────────────────────────────────────────────────
-
-function renderLeftPanel(lists, cards, tasks) {
-  leftBody.innerHTML = '';
-
-  for (const list of lists) {
-    const listCards = cards.filter(c => c.idList === list.id);
-    if (listCards.length === 0) continue;
-
-    const color = colorMap[list.id];
-
-    // Group header row — includes "+ Add task" button so it doesn't add an extra row
-    const groupRow = document.createElement('div');
-    groupRow.className = 'left-group-row';
-    groupRow.style.setProperty('--group-color', color);
-    groupRow.innerHTML = `
-      <button class="group-collapse" data-list="${list.id}" title="Collapse">▾</button>
-      <span class="group-name">${escapeHtml(list.name)}</span>
-      <button class="add-task-btn-inline" data-list="${list.id}" title="Add task">+</button>
-    `;
-    leftBody.appendChild(groupRow);
-
-    // Task rows — one per card, 38px each to match Frappe Gantt rows exactly
-    const taskGroup = document.createElement('div');
-    taskGroup.className = 'left-task-group';
-    taskGroup.dataset.listId = list.id;
-
-    for (const card of listCards) {
-      const pd  = tasks.find(tk => tk.id === card.id);
-      const pct = pd?.progress ?? 0;
-
-      const row = document.createElement('div');
-      row.className = 'left-task-row';
-      row.dataset.cardId = card.id;
-
-      const avatars = (card.members || []).slice(0, 3).map(m =>
-        `<img class="avatar" src="${m.avatarUrl}/30.png" alt="${escapeHtml(m.fullName)}" title="${escapeHtml(m.fullName)}">`
-      ).join('');
-
-      row.innerHTML = `
-        <span class="task-name" title="${escapeHtml(card.name)}">${escapeHtml(card.name)}</span>
-        <span class="task-avatars">${avatars}</span>
-        <span class="task-pct">${pct}%</span>
-      `;
-
-      taskGroup.appendChild(row);
-    }
-
-    leftBody.appendChild(taskGroup);
-  }
-
-  // Collapse toggle
-  leftBody.querySelectorAll('.group-collapse').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const listId = btn.dataset.list;
-      const group  = leftBody.querySelector(`.left-task-group[data-list-id="${listId}"]`);
-      const collapsed = group.classList.toggle('collapsed');
-      btn.textContent = collapsed ? '▸' : '▾';
-    });
-  });
-
-  // Inline add-task buttons in group headers
-  leftBody.querySelectorAll('.add-task-btn-inline').forEach(btn => {
-    btn.addEventListener('click', () => showAddTask(btn.dataset.list, btn));
-  });
-
-  syncScrollHeights();
-}
-
 // ── Add task inline ───────────────────────────────────────────────────────────
 
 function showAddTask(listId, anchorRow) {
@@ -250,6 +180,12 @@ function showAddTask(listId, anchorRow) {
   addOverlay.style.display = 'flex';
   addInput.focus();
 }
+
+// Delegate add-task clicks from inside Frappe Gantt popups
+ganttRight.addEventListener('click', (e) => {
+  const btn = e.target.closest('.popup-add-task');
+  if (btn) showAddTask(btn.dataset.list, btn);
+});
 
 addCancel.addEventListener('click', () => {
   addOverlay.style.display = 'none';
@@ -285,21 +221,6 @@ async function submitAddTask() {
     addConfirm.disabled = false;
     addConfirm.textContent = 'Add';
   }
-}
-
-// ── Scroll sync ───────────────────────────────────────────────────────────────
-
-function syncScrollHeights() {
-  // Sync vertical scroll between left panel and Frappe Gantt's grid body
-  const ganttBody = ganttRight.querySelector('.gantt .grid-body');
-  if (!ganttBody) return;
-
-  ganttRight.addEventListener('scroll', () => {
-    leftBody.scrollTop = ganttRight.scrollTop;
-  });
-  leftBody.addEventListener('scroll', () => {
-    ganttRight.scrollTop = leftBody.scrollTop;
-  });
 }
 
 // ── Date change handler (debounced — fires on every drag tick, writes on release) ─
@@ -362,7 +283,11 @@ function renderGantt(tasks, viewMode = 'Week') {
     popup_trigger: 'click',
     custom_popup_html: (task) => {
       if (task._isGroup) {
-        return `<div class="gantt-popup-group">${escapeHtml(task.name)}</div>`;
+        return `
+          <div class="gantt-popup">
+            <strong>${escapeHtml(task.name)}</strong>
+            <button class="popup-add-task btn btn-primary btn-sm" data-list="${task._listId}">+ Add task</button>
+          </div>`;
       }
       const start = task.start ? task.start.split('T')[0] : '—';
       const end   = task._isMilestone ? start : (task.end ? task.end.split('T')[0] : '—');
@@ -396,8 +321,11 @@ function injectTaskColors(tasks) {
   let css = '';
   tasks.forEach(task => {
     if (task._color) {
-      css += `.gantt .bar-wrapper[data-id="${task.id}"] .bar { fill: ${task._color}; }\n`;
-      if (!task._isGroup) {
+      if (task._isGroup) {
+        // Light tinted background for phase header rows
+        css += `.gantt .bar-wrapper[data-id="${task.id}"] .bar { fill: ${task._color}22; stroke: ${task._color}66; stroke-width: 1; }\n`;
+      } else {
+        css += `.gantt .bar-wrapper[data-id="${task.id}"] .bar { fill: ${task._color}; }\n`;
         css += `.gantt .bar-wrapper[data-id="${task.id}"] .bar-progress { fill: ${task._color}cc; }\n`;
       }
     }
@@ -423,7 +351,6 @@ async function refresh() {
     const viewMode = viewToggle.querySelector('.active')?.dataset.mode || 'Week';
 
     renderGantt(tasks, viewMode);
-    renderLeftPanel(lists, cards, tasks);
     statusBar.style.display = 'none';
   } catch (err) {
     showStatus(err.message, true);
