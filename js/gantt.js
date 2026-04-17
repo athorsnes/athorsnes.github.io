@@ -142,8 +142,10 @@ function buildGanttTasks(lists, cards, pluginId) {
 
     for (const card of listCards) {
       const pd    = getPluginData(card, pluginId);
+      const isMilestone = !!pd.isMilestone;
       const start = toDateStr(card.start) || toDateStr(card.due) || today();
-      const end   = toDateStr(card.due)   || addDays(start, 1);
+      // Milestones must have a 1-day span so Frappe Gantt renders them
+      const end   = isMilestone ? addDays(start, 1) : (toDateStr(card.due) || addDays(start, 1));
 
       tasks.push({
         id:           card.id,
@@ -152,10 +154,10 @@ function buildGanttTasks(lists, cards, pluginId) {
         end,
         progress:     pd.percentComplete ?? 0,
         dependencies: (pd.dependencies || []).join(', '),
-        custom_class: pd.isMilestone ? 'milestone-bar' : 'task-bar',
+        custom_class: isMilestone ? 'milestone-bar' : 'task-bar',
         _isGroup:     false,
         _listId:      list.id,
-        _isMilestone: !!pd.isMilestone,
+        _isMilestone: isMilestone,
         _members:     card.members || [],
         _color:       colorMap[list.id],
       });
@@ -343,26 +345,31 @@ function renderGantt(tasks, viewMode = 'Week') {
     date_format: 'YYYY-MM-DD',
     popup_trigger: 'click',
     custom_popup_html: (task) => {
-      if (task._isGroup) return `<div class="gantt-popup-group">${escapeHtml(task.name)}</div>`;
+      if (task._isGroup) {
+        return `<div class="gantt-popup-group">${escapeHtml(task.name)}</div>`;
+      }
       const start = task.start ? task.start.split('T')[0] : '—';
-      const end   = task.end   ? task.end.split('T')[0]   : '—';
+      const end   = task._isMilestone ? start : (task.end ? task.end.split('T')[0] : '—');
+      const card  = boardData.cards.find(c => c.id === task.id);
+      const cardUrl = card ? card.url : null;
       return `
         <div class="gantt-popup">
           <strong>${escapeHtml(task.name)}</strong>
-          <div class="popup-dates">${start} → ${end}</div>
-          <div class="popup-progress">
-            <div class="popup-progress-bar" style="width:${task.progress}%"></div>
-          </div>
-          <span class="popup-pct">${task.progress}%</span>
+          ${task._isMilestone ? '<span class="popup-milestone">◆ Milestone</span>' : ''}
+          <div class="popup-dates">${start}${task._isMilestone ? '' : ` → ${end}`}</div>
+          ${!task._isMilestone ? `
+          <div class="popup-progress-wrap">
+            <div class="popup-progress">
+              <div class="popup-progress-bar" style="width:${task.progress}%"></div>
+            </div>
+            <span class="popup-pct">${task.progress}%</span>
+          </div>` : ''}
+          ${cardUrl ? `<a href="${cardUrl}" target="_blank" class="popup-open-card">Open Card ↗</a>` : ''}
         </div>
       `;
     },
-    on_click: (task) => {
-      if (!task._isGroup) {
-        // Open Trello card
-        const card = boardData.cards.find(c => c.id === task.id);
-        if (card) t.navigate({ url: card.url });
-      }
+    on_click: () => {
+      // Handled via "Open Card" link in the popup — keeps the Gantt modal open
     },
     on_date_change: onDateChange,
     on_progress_change: onProgressChange,

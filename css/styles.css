@@ -591,14 +591,15 @@ input[type="range"] {
 }
 .gantt .bar-wrapper.group-header-bar .bar-label { display: none; }
 
-/* Milestone bars (diamond shape via CSS clip) */
+/* Milestone bars — rotate the rect 45° to form a diamond */
 .gantt .bar-wrapper.milestone-bar .bar {
-  width: 12px !important;
-  height: 12px !important;
-  transform: rotate(45deg) translateX(-4px);
-  rx: 0 !important;
+  transform-box:    fill-box;
+  transform-origin: center;
+  transform:        rotate(45deg) scale(0.65) !important;
+  rx:               0 !important;
 }
-.gantt .bar-wrapper.milestone-bar .bar-progress { display: none; }
+.gantt .bar-wrapper.milestone-bar .bar-progress { display: none !important; }
+.gantt .bar-wrapper.milestone-bar .handle       { display: none !important; }
 
 /* Custom popup */
 .gantt-popup {
@@ -611,15 +612,32 @@ input[type="range"] {
 }
 .gantt-popup strong { display: block; margin-bottom: 4px; font-size: 12px; }
 .popup-dates { font-size: 11px; color: var(--text-muted); margin-bottom: 6px; }
+.popup-milestone {
+  display: inline-block;
+  font-size: 11px;
+  color: var(--purple);
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.popup-progress-wrap { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
 .popup-progress {
+  flex: 1;
   height: 4px;
   background: var(--gray-200);
   border-radius: 2px;
   overflow: hidden;
-  margin-bottom: 2px;
 }
 .popup-progress-bar { height: 100%; background: var(--blue); border-radius: 2px; }
-.popup-pct { font-size: 11px; color: var(--text-muted); }
+.popup-pct { font-size: 11px; color: var(--text-muted); flex-shrink: 0; }
+.popup-open-card {
+  display: block;
+  margin-top: 8px;
+  font-size: 11px;
+  color: var(--blue);
+  text-decoration: none;
+  font-weight: 500;
+}
+.popup-open-card:hover { text-decoration: underline; }
 
 .gantt-popup-group {
   font-size: 12px;
