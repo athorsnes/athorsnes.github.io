@@ -560,6 +560,10 @@ input[type="range"] {
   overflow: auto;
   position: relative;
 }
+/* Prevent Frappe Gantt from adding excessive blank space below last row */
+.gantt-right svg#gantt {
+  display: block;
+}
 
 /* ── Add-task overlay ─────────────────────────────────────────────────────── */
 
@@ -597,20 +601,25 @@ input[type="range"] {
 .gantt .row-line { stroke: var(--border) !important; }
 .gantt .today-highlight { fill: #e8f1fb !important; opacity: 0.6; }
 
-/* Group header bars (thinner, semi-transparent) */
-.gantt .bar-wrapper.group-header-bar .bar {
-  height: 10px !important;
-  y: calc(50% - 5px);
-  opacity: 0.5;
+/* Group header bars — fully hidden; the left panel labels groups */
+.gantt .bar-wrapper.group-header-bar {
+  pointer-events: none;
 }
-.gantt .bar-wrapper.group-header-bar .bar-label { display: none; }
+.gantt .bar-wrapper.group-header-bar .bar,
+.gantt .bar-wrapper.group-header-bar .bar-progress,
+.gantt .bar-wrapper.group-header-bar .bar-label,
+.gantt .bar-wrapper.group-header-bar .handle {
+  display: none !important;
+}
 
-/* Milestone bars — rotate the rect 45° to form a diamond */
+/* Milestone bars — fixed 14×14 square rotated 45° = proper diamond */
 .gantt .bar-wrapper.milestone-bar .bar {
+  width:            14px !important;
+  height:           14px !important;
+  rx:               0 !important;
   transform-box:    fill-box;
   transform-origin: center;
-  transform:        rotate(45deg) scale(0.65) !important;
-  rx:               0 !important;
+  transform:        rotate(45deg) !important;
 }
 .gantt .bar-wrapper.milestone-bar .bar-progress { display: none !important; }
 .gantt .bar-wrapper.milestone-bar .handle       { display: none !important; }
