@@ -349,8 +349,11 @@ async function onProgressChange(task, progress) {
 // ── Gantt render ──────────────────────────────────────────────────────────────
 
 function renderGantt(tasks, viewMode = 'Week') {
-  // Inject per-task colors via CSS custom properties using Frappe's custom_class
   injectTaskColors(tasks);
+
+  // Frappe Gantt appends to the SVG on every call — clear it first
+  const svgEl = document.getElementById('gantt');
+  if (svgEl) svgEl.innerHTML = '';
 
   ganttInstance = new Gantt('#gantt', tasks, {
     view_mode: viewMode,
