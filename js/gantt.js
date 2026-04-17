@@ -352,9 +352,9 @@ async function onProgressChange(task, progress) {
 function renderGantt(tasks, viewMode = 'Week') {
   injectTaskColors(tasks);
 
-  // Frappe Gantt appends to the SVG on every call — clear it first
-  const svgEl = document.getElementById('gantt');
-  if (svgEl) svgEl.innerHTML = '';
+  // Frappe Gantt wraps the SVG in a container div on each call — replace the
+  // entire gantt-right contents so no stale wrappers accumulate across renders
+  ganttRight.innerHTML = '<svg id="gantt"></svg>';
 
   ganttInstance = new Gantt('#gantt', tasks, {
     view_mode: viewMode,
