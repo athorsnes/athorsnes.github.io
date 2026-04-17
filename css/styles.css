@@ -402,18 +402,26 @@ input[type="range"] {
 .view-toggle button:hover  { background: var(--gray-100); }
 .view-toggle button.active { background: var(--blue); color: #fff; }
 
-/* Status bar */
+/* Status bar — fixed overlay so it never shifts layout */
 .status-bar {
-  height: var(--status-bar-height);
-  padding: 0 16px;
+  position: fixed;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  height: auto;
+  padding: 6px 16px;
   display: flex;
   align-items: center;
-  background: var(--blue-light);
-  color: var(--blue-dark);
+  background: var(--blue-dark);
+  color: #fff;
   font-size: 12px;
-  flex-shrink: 0;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+  z-index: 1000;
+  white-space: nowrap;
+  pointer-events: none;
 }
-.status-bar.status-error { background: #fdf0ef; color: var(--red); }
+.status-bar.status-error { background: var(--red); color: #fff; }
 
 /* Main area */
 .gantt-main {
