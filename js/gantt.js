@@ -1,4 +1,4 @@
-/* global TrelloPowerUp, Gantt, TRELLEGANT_CONFIG */
+/* global TrelloPowerUp, Gantt, TRELLEGANT_CONFIG, TRELLEGANT_VERSION, TRELLEGANT_BUILD */
 'use strict';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
@@ -32,6 +32,7 @@ const viewToggle     = document.getElementById('view-toggle');
 const btnRefresh     = document.getElementById('btn-refresh');
 const btnNewProject  = document.getElementById('btn-new-project');
 const btnClose       = document.getElementById('btn-close');
+const versionBadge   = document.getElementById('version-badge');
 const addOverlay     = document.getElementById('add-task-overlay');
 const addInput       = document.getElementById('add-task-input');
 const addConfirm     = document.getElementById('add-task-confirm');
@@ -464,5 +465,14 @@ function escapeHtml(str) {
 }
 
 // ── Init ──────────────────────────────────────────────────────────────────────
+
+// Show version + build time in header
+if (typeof TRELLEGANT_VERSION !== 'undefined') {
+  const buildDate = new Date(TRELLEGANT_BUILD);
+  const buildStr  = buildDate.toLocaleString('en-GB', {
+    day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit',
+  });
+  versionBadge.textContent = `v${TRELLEGANT_VERSION} · ${buildStr}`;
+}
 
 refresh();
