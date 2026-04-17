@@ -301,18 +301,36 @@ function syncScrollHeights() {
   });
 }
 
-// ── Date change handler ───────────────────────────────────────────────────────
+// ── Date change handler (debounced — fires on every drag tick, writes on release) ─
 
-async function onDateChange(task, startDate, endDate) {
+const pendingDateChanges = {}; // cardId → { timer, start, end }
+
+function onDateChange(task, startDate, endDate) {
   if (task._isGroup) return;
-  try {
-    const start = startDate.toISOString().split('T')[0];
-    const end   = endDate.toISOString().split('T')[0];
-    await apiCall(`/cards/${task.id}`, 'PUT', { start, due: end });
-    // Update left panel pct label silently (no full refresh needed for date)
-  } catch (err) {
-    showStatus(`Failed to update dates: ${err.message}`, true);
+
+  const start = startDate.toISOString().split('T')[0];
+  const end   = endDate.toISOString().split('T')[0];
+
+  // Show the live date in the status bar while dragging (visual feedback)
+  showStatus(`${task.name}: ${start} → ${end}`);
+
+  // Clear any pending write for this card
+  if (pendingDateChanges[task.id]) {
+    clearTimeout(pendingDateChanges[task.id].timer);
   }
+
+  // Schedule the write 600ms after the last drag tick (i.e. on mouse release)
+  pendingDateChanges[task.id] = {
+    timer: setTimeout(async () => {
+      delete pendingDateChanges[task.id];
+      try {
+        await apiCall(`/cards/${task.id}`, 'PUT', { start, due: end });
+        showStatus(`Saved: ${task.name} → ${start} to ${end}`);
+      } catch (err) {
+        showStatus(`Failed to save dates: ${err.message}`, true);
+      }
+    }, 600),
+  };
 }
 
 // ── Progress change handler ───────────────────────────────────────────────────
