@@ -178,23 +178,24 @@ function renderLeftPanel(lists, cards, tasks) {
 
     const color = colorMap[list.id];
 
-    // Group header row
+    // Group header row — includes "+ Add task" button so it doesn't add an extra row
     const groupRow = document.createElement('div');
     groupRow.className = 'left-group-row';
     groupRow.style.setProperty('--group-color', color);
     groupRow.innerHTML = `
       <button class="group-collapse" data-list="${list.id}" title="Collapse">▾</button>
       <span class="group-name">${escapeHtml(list.name)}</span>
+      <button class="add-task-btn-inline" data-list="${list.id}" title="Add task">+</button>
     `;
     leftBody.appendChild(groupRow);
 
-    // Task rows
+    // Task rows — one per card, 38px each to match Frappe Gantt rows exactly
     const taskGroup = document.createElement('div');
     taskGroup.className = 'left-task-group';
     taskGroup.dataset.listId = list.id;
 
     for (const card of listCards) {
-      const pd = tasks.find(t => t.id === card.id);
+      const pd  = tasks.find(tk => tk.id === card.id);
       const pct = pd?.progress ?? 0;
 
       const row = document.createElement('div');
@@ -211,20 +212,8 @@ function renderLeftPanel(lists, cards, tasks) {
         <span class="task-pct">${pct}%</span>
       `;
 
-      row.addEventListener('click', () => {
-        t.navigate({ url: card.url });
-      });
-
       taskGroup.appendChild(row);
     }
-
-    // "+ Add task" row
-    const addRow = document.createElement('div');
-    addRow.className = 'left-add-row';
-    addRow.dataset.listId = list.id;
-    addRow.innerHTML = `<button class="add-task-btn">+ Add task</button>`;
-    addRow.querySelector('button').addEventListener('click', () => showAddTask(list.id, addRow));
-    taskGroup.appendChild(addRow);
 
     leftBody.appendChild(taskGroup);
   }
@@ -237,6 +226,11 @@ function renderLeftPanel(lists, cards, tasks) {
       const collapsed = group.classList.toggle('collapsed');
       btn.textContent = collapsed ? '▸' : '▾';
     });
+  });
+
+  // Inline add-task buttons in group headers
+  leftBody.querySelectorAll('.add-task-btn-inline').forEach(btn => {
+    btn.addEventListener('click', () => showAddTask(btn.dataset.list, btn));
   });
 
   syncScrollHeights();

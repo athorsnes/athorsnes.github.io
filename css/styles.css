@@ -455,7 +455,7 @@ input[type="range"] {
   align-items: center;
   gap: 6px;
   height: var(--gantt-row-height);
-  padding: 0 10px;
+  padding: 0 8px 0 10px;
   background: var(--gray-50);
   border-bottom: 1px solid var(--border);
   border-left: 4px solid var(--group-color, var(--blue));
@@ -473,6 +473,7 @@ input[type="range"] {
   flex-shrink: 0;
 }
 .group-name {
+  flex: 1;
   font-size: 12px;
   font-weight: 700;
   color: var(--text);
@@ -480,6 +481,23 @@ input[type="range"] {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.add-task-btn-inline {
+  flex-shrink: 0;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-muted);
+  font-size: 14px;
+  line-height: 1;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.12s, border-color 0.12s;
+}
+.add-task-btn-inline:hover { color: var(--blue); border-color: var(--blue); }
 
 /* Task rows */
 .left-task-group.collapsed .left-task-row,
@@ -521,24 +539,6 @@ input[type="range"] {
   flex-shrink: 0;
 }
 
-/* Add task row */
-.left-add-row {
-  height: 32px;
-  padding: 0 10px 0 20px;
-  display: flex;
-  align-items: center;
-  border-bottom: 1px solid var(--border);
-}
-.add-task-btn {
-  background: none;
-  border: none;
-  color: var(--text-muted);
-  font-size: 12px;
-  cursor: pointer;
-  padding: 0;
-  transition: color 0.12s;
-}
-.add-task-btn:hover { color: var(--blue); }
 
 /* Right panel */
 .gantt-right {
