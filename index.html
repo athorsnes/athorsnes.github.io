@@ -1,12 +1,32 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Trellegant – Connector</title>
-  <script src="https://p.trellocdn.com/power-up.min.js"></script>
-  <script src="./js/config.js"></script>
-  <script src="./js/connector.js"></script>
-</head>
-<body></body>
+  <head>
+    <script type="module">
+          const _send = (level, args) => fetch('/dev-log', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ level, args: args.map(a => typeof a === 'object' ? JSON.stringify(a) : String(a)) }) }).catch(() => {});
+          const _log = console.log.bind(console);
+          const _warn = console.warn.bind(console);
+          const _error = console.error.bind(console);
+          console.log = (...a) => { _log(...a); _send('log', a); };
+          console.warn = (...a) => { _warn(...a); _send('warn', a); };
+          console.error = (...a) => { _error(...a); _send('error', a); };
+          window.addEventListener('error', e => _send('error', ['[uncaught]', e.message, e.filename + ':' + e.lineno]));
+          window.addEventListener('unhandledrejection', e => _send('error', ['[unhandledrejection]', String(e.reason?.stack ?? e.reason)]));
+        </script>
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ReadySet</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+      body { font-family: 'IBM Plex Sans', sans-serif; color: #1b2332; background: #fff; -webkit-font-smoothing: antialiased; }
+    </style>
+    <script type="module" crossorigin src="/assets/index-C-NE7XH0.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-Byqhr4PE.css">
+  </head>
+  <body>
+    <div id="app"></div>
+  </body>
 </html>
